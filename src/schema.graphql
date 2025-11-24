@@ -1,0 +1,28 @@
+scalar Upload
+scalar DateTime
+
+type Receipt {
+  id: ID!
+  storeName: String
+  purchaseDate: DateTime
+  totalAmount: Float
+  items: [Item]
+  imageUrl: String!
+  createdAt: DateTime!
+}
+
+type Item {
+  id: ID!
+  name: String!
+  quantity: Int
+  price: Float
+}
+
+type Query {
+  receipts: [Receipt]
+  receipt(id: ID!): Receipt
+}
+
+type Mutation {
+  uploadReceipt(file: Upload!): Receipt
+}
