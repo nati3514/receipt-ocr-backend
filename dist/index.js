@@ -21,9 +21,11 @@ const server = new ApolloServer({
 });
 const startServer = async () => {
     await server.start();
+    // Add body parser for regular requests
+    app.use(express.json());
     app.use('/graphql', cors(), 
-    // IMPORTANT: Do NOT use express.json() - it conflicts with graphqlUploadExpress
-    // graphqlUploadExpress must come BEFORE expressMiddleware
+    // graphqlUploadExpress handles multipart/form-data for file uploads
+    // It will override express.json() when needed
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 1 }), expressMiddleware(server));
     // Serve uploaded files
     app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

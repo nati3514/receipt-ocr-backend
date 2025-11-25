@@ -11,7 +11,13 @@ export declare const resolvers: {
         extensionASTNodes: ReadonlyArray<import("graphql").ScalarTypeExtensionNode>;
     };
     Query: {
-        receipts: () => Promise<({
+        receipts: (_: any, { filter }: {
+            filter?: {
+                storeName?: string;
+                startDate?: Date;
+                endDate?: Date;
+            };
+        }) => Promise<({
             items: {
                 id: string;
                 name: string;

@@ -18,8 +18,14 @@ type Item {
   price: Float
 }
 
+input ReceiptFilter {
+  storeName: String
+  startDate: DateTime
+  endDate: DateTime
+}
+
 type Query {
-  receipts: [Receipt]
+  receipts(filter: ReceiptFilter): [Receipt]
   receipt(id: ID!): Receipt
 }
 

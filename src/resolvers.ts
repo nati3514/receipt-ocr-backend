@@ -27,8 +27,33 @@ const CustomUpload = {
 export const resolvers = {
     Upload: CustomUpload,
     Query: {
-        receipts: async () => {
-            return prisma.receipt.findMany({ include: { items: true }, orderBy: { createdAt: 'desc' } });
+        receipts: async (_: any, { filter }: { filter?: { storeName?: string; startDate?: Date; endDate?: Date } }) => {
+            const where: any = {};
+
+            // Filter by store name (case-insensitive partial match)
+            if (filter?.storeName) {
+                where.storeName = {
+                    contains: filter.storeName,
+                    mode: 'insensitive'
+                };
+            }
+
+            // Filter by date range on purchaseDate
+            if (filter?.startDate || filter?.endDate) {
+                where.purchaseDate = {};
+                if (filter.startDate) {
+                    where.purchaseDate.gte = new Date(filter.startDate);
+                }
+                if (filter.endDate) {
+                    where.purchaseDate.lte = new Date(filter.endDate);
+                }
+            }
+
+            return prisma.receipt.findMany({
+                where,
+                include: { items: true },
+                orderBy: { createdAt: 'desc' }
+            });
         },
         receipt: async (_: any, { id }: { id: string }) => {
             return prisma.receipt.findUnique({ where: { id }, include: { items: true } });
