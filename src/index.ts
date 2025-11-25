@@ -42,8 +42,11 @@ const startServer = async () => {
     // Serve uploaded files
     app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-    await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
-    console.log(`Server ready at http://localhost:4000/graphql`);
+    const PORT = process.env.PORT || 4000;
+    await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, () => {
+        console.log(`Server ready at http://localhost:${PORT}/graphql`);
+        resolve();
+    }));
 };
 
 startServer();
