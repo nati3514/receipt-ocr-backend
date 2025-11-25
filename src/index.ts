@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -42,7 +43,7 @@ const startServer = async () => {
     // Serve uploaded files
     app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-    const PORT = process.env.PORT || 4000;
+    const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
     await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, () => {
         console.log(`Server ready at http://localhost:${PORT}/graphql`);
         resolve();
