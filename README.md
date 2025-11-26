@@ -216,6 +216,31 @@ npm test
    
    ```
 
+## How It Works
+
+### Asynchronous Processing Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Queue
+    participant Worker
+    participant Database
+
+    Client->>API: uploadReceipt(file)
+    API->>Database: Create receipt (status: pending)
+    API->>Queue: Add OCR job
+    API-->>Client: Return receipt (pending)
+    
+    Queue->>Worker: Process job
+    Worker->>Worker: Run Tesseract OCR
+    Worker->>Database: Update receipt (status: completed)
+    
+    Client->>API: receiptStatus(id)
+    API-->>Client: Return receipt (completed)
+```
+
 ## Monitoring and Maintenance
 
 ### Queue Management
