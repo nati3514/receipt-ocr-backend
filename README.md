@@ -43,7 +43,7 @@ A high-performance GraphQL API for processing and managing receipts using OCR (O
 
 1. **Clone and install dependencies**
    ```bash
-   git clone https://github.com/yourusername/receipt-ocr-backend.git
+   git clone https://github.com/nati3514/receipt-ocr-backend.git
    cd receipt-ocr-backend
    npm install
    ```
