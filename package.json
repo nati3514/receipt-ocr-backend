@@ -27,6 +27,7 @@
   "dependencies": {
     "@apollo/server": "^4.12.2",
     "@prisma/client": "^5.22.0",
+    "bullmq": "^5.65.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
