@@ -8,7 +8,10 @@ type Receipt {
   totalAmount: Float
   items: [Item]
   imageUrl: String!
+  status: String!
+  errorMessage: String
   createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Item {
@@ -27,8 +30,10 @@ input ReceiptFilter {
 type Query {
   receipts(filter: ReceiptFilter): [Receipt]
   receipt(id: ID!): Receipt
+  receiptStatus(id: ID!): Receipt
 }
 
 type Mutation {
   uploadReceipt(file: Upload!): Receipt
+  retryReceipt(id: ID!): Receipt
 }

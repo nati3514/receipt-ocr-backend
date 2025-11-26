@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -10,6 +9,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { fileURLToPath } from 'url';
+import './workers/ocr.worker.js'; // Start OCR worker
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const typeDefs = readFileSync(path.join(__dirname, 'schema.graphql'), { encoding: 'utf-8' });
@@ -30,11 +30,8 @@ const startServer = async () => {
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 1 }), expressMiddleware(server));
     // Serve uploaded files
     app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-    const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
-    await new Promise((resolve) => httpServer.listen({ port: PORT }, () => {
-        console.log(`Server ready at http://localhost:${PORT}/graphql`);
-        resolve();
-    }));
+    await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
+    console.log(`Server ready at http://localhost:4000/graphql`);
 };
 startServer();
 //# sourceMappingURL=index.js.map

@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { GraphQLUpload } from 'graphql-upload-ts';
-import { processReceipt } from './services/ocr.service.js';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
+import { ocrQueue } from './queues/ocr.queue.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const prisma = new PrismaClient();
@@ -51,11 +51,14 @@ export const resolvers = {
         receipt: async (_, { id }) => {
             return prisma.receipt.findUnique({ where: { id }, include: { items: true } });
         },
+        receiptStatus: async (_, { id }) => {
+            return prisma.receipt.findUnique({ where: { id }, include: { items: true } });
+        },
     },
     Mutation: {
         uploadReceipt: async (_, { file }) => {
             // The file is already processed by graphqlUploadExpress middleware
-            const { createReadStream, filename, mimetype, encoding } = await file;
+            const { createReadStream, filename } = await file;
             const stream = createReadStream();
             const uploadDir = path.join(__dirname, '../uploads');
             if (!fs.existsSync(uploadDir)) {
@@ -69,25 +72,43 @@ export const resolvers = {
                 stream.on('end', resolve);
                 stream.on('error', reject);
             });
-            console.log(`File uploaded: ${filePath}`);
-            const receiptData = await processReceipt(filePath);
+            console.log(`📁 File uploaded: ${filePath}`);
+            // Create receipt with pending status
             const receipt = await prisma.receipt.create({
                 data: {
-                    storeName: receiptData.storeName,
-                    purchaseDate: receiptData.purchaseDate,
-                    totalAmount: receiptData.totalAmount,
                     imageUrl: `/uploads/${uniqueFilename}`,
-                    items: {
-                        create: receiptData.items.map((item) => ({
-                            name: item.name,
-                            price: item.price,
-                            quantity: item.quantity || 1,
-                        })),
-                    },
+                    status: 'pending',
                 },
                 include: { items: true },
             });
+            // Add to queue for background processing
+            await ocrQueue.add('process-receipt', {
+                receiptId: receipt.id,
+                imagePath: filePath,
+            });
+            console.log(`📋 Queued OCR job for receipt: ${receipt.id}`);
             return receipt;
+        },
+        retryReceipt: async (_, { id }) => {
+            const receipt = await prisma.receipt.findUnique({ where: { id } });
+            if (!receipt) {
+                throw new Error('Receipt not found');
+            }
+            if (receipt.status !== 'failed') {
+                throw new Error('Can only retry failed receipts');
+            }
+            // Reset status and re-queue
+            await prisma.receipt.update({
+                where: { id },
+                data: { status: 'pending', errorMessage: null },
+            });
+            const imagePath = path.join(__dirname, '..', receipt.imageUrl);
+            await ocrQueue.add('process-receipt', {
+                receiptId: receipt.id,
+                imagePath,
+            });
+            console.log(`🔄 Retrying OCR for receipt: ${id}`);
+            return prisma.receipt.findUnique({ where: { id }, include: { items: true } });
         },
     },
 };

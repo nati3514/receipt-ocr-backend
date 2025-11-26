@@ -21,18 +21,21 @@ export declare const resolvers: {
             items: {
                 id: string;
                 name: string;
+                receiptId: string;
                 quantity: number | null;
                 price: number | null;
-                receiptId: string;
             }[];
         } & {
+            id: string;
             storeName: string | null;
             purchaseDate: Date | null;
             totalAmount: number | null;
-            rawText: string | null;
-            id: string;
             imageUrl: string;
+            rawText: string | null;
+            status: string;
+            errorMessage: string | null;
             createdAt: Date;
+            updatedAt: Date;
         })[]>;
         receipt: (_: any, { id }: {
             id: string;
@@ -40,18 +43,43 @@ export declare const resolvers: {
             items: {
                 id: string;
                 name: string;
+                receiptId: string;
                 quantity: number | null;
                 price: number | null;
-                receiptId: string;
             }[];
         } & {
+            id: string;
             storeName: string | null;
             purchaseDate: Date | null;
             totalAmount: number | null;
-            rawText: string | null;
-            id: string;
             imageUrl: string;
+            rawText: string | null;
+            status: string;
+            errorMessage: string | null;
             createdAt: Date;
+            updatedAt: Date;
+        }) | null>;
+        receiptStatus: (_: any, { id }: {
+            id: string;
+        }) => Promise<({
+            items: {
+                id: string;
+                name: string;
+                receiptId: string;
+                quantity: number | null;
+                price: number | null;
+            }[];
+        } & {
+            id: string;
+            storeName: string | null;
+            purchaseDate: Date | null;
+            totalAmount: number | null;
+            imageUrl: string;
+            rawText: string | null;
+            status: string;
+            errorMessage: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         }) | null>;
     };
     Mutation: {
@@ -61,19 +89,44 @@ export declare const resolvers: {
             items: {
                 id: string;
                 name: string;
+                receiptId: string;
                 quantity: number | null;
                 price: number | null;
-                receiptId: string;
             }[];
         } & {
+            id: string;
             storeName: string | null;
             purchaseDate: Date | null;
             totalAmount: number | null;
-            rawText: string | null;
-            id: string;
             imageUrl: string;
+            rawText: string | null;
+            status: string;
+            errorMessage: string | null;
             createdAt: Date;
+            updatedAt: Date;
         }>;
+        retryReceipt: (_: any, { id }: {
+            id: string;
+        }) => Promise<({
+            items: {
+                id: string;
+                name: string;
+                receiptId: string;
+                quantity: number | null;
+                price: number | null;
+            }[];
+        } & {
+            id: string;
+            storeName: string | null;
+            purchaseDate: Date | null;
+            totalAmount: number | null;
+            imageUrl: string;
+            rawText: string | null;
+            status: string;
+            errorMessage: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        }) | null>;
     };
 };
 //# sourceMappingURL=resolvers.d.ts.map
